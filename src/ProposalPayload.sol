@@ -3,9 +3,13 @@ pragma solidity ^0.8.0;
 
 import {ILendingPool} from "./external/aave/ILendingPool.sol";
 
-/// @title <TITLE>
-/// @author <AUTHOR>
-/// @notice <DESCRIPTION>
+/**
+ * @title <TITLE>
+ * @author <AUTHOR>
+ * @notice <DESCRIPTION>
+ * Governance Forum Post:
+ * Snapshot:
+ */
 contract ProposalPayload {
     /*///////////////////////////////////////////////////////////////
                                CONSTANTS
