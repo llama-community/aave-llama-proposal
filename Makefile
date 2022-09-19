@@ -8,9 +8,9 @@ install  :; forge install
 
 # Build & test
 build    :; forge clean && forge build
-test     :; forge clean && forge test -f ${RPC_MAINNET} --fork-block-number ${BLOCK_NUMBER} --etherscan-api-key ${ETHERSCAN_API_KEY} $(call compute_test_verbosity,${V}) # Usage: make test [optional](V=<{1,2,3,4,5}>)
-match    :; forge clean && forge test -f ${RPC_MAINNET} --fork-block-number ${BLOCK_NUMBER} --etherscan-api-key ${ETHERSCAN_API_KEY} -m ${MATCH} $(call compute_test_verbosity,${V}) # Usage: make match MATCH=<TEST_FUNCTION_NAME> [optional](V=<{1,2,3,4,5}>)
-report   :; forge clean && forge test -f ${RPC_MAINNET} --fork-block-number ${BLOCK_NUMBER} --gas-report | sed -e/╭/\{ -e:1 -en\;b1 -e\} -ed | cat > .gas-report
+test     :; forge clean && forge test --etherscan-api-key ${ETHERSCAN_API_KEY} $(call compute_test_verbosity,${V}) # Usage: make test [optional](V=<{1,2,3,4,5}>)
+match    :; forge clean && forge test --etherscan-api-key ${ETHERSCAN_API_KEY} -m ${MATCH} $(call compute_test_verbosity,${V}) # Usage: make match MATCH=<TEST_FUNCTION_NAME> [optional](V=<{1,2,3,4,5}>)
+report   :; forge clean && forge test --gas-report | sed -e/╭/\{ -e:1 -en\;b1 -e\} -ed | cat > .gas-report
 clean    :; forge clean
 lint     :; npx prettier --write src/**/*.sol
 

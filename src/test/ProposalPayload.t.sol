@@ -1,21 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-pragma solidity ^0.8.12;
+pragma solidity ^0.8.0;
 
 // testing libraries
-import "@ds/test.sol";
-import "@std/console.sol";
-import {stdCheats} from "@std/stdlib.sol";
-import {Vm} from "@std/Vm.sol";
-import {DSTestPlus} from "@solmate/test/utils/DSTestPlus.sol";
+import "@forge-std/Test.sol";
 
 // contract dependencies
 import "../external/aave/IAaveGovernanceV2.sol";
 import "../external/aave/IExecutorWithTimelock.sol";
 import "../ProposalPayload.sol";
 
-contract ProposalPayloadTest is DSTestPlus, stdCheats {
-    Vm private vm = Vm(HEVM_ADDRESS);
-
+contract ProposalPayloadTest is Test {
     address private aaveTokenAddress = 0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9;
 
     address private aaveGovernanceAddress = 0xEC568fffba86c094cf06b22134B23074DFE2252c;
@@ -40,6 +34,9 @@ contract ProposalPayloadTest is DSTestPlus, stdCheats {
     uint256 private proposalId;
 
     function setUp() public {
+        // To fork at a specific block: vm.createSelectFork(vm.rpcUrl("mainnet", BLOCK_NUMBER));
+        vm.createSelectFork(vm.rpcUrl("mainnet"));
+
         // aave whales may need to be updated based on the block being used
         // these are sometimes exchange accounts or whale who move their funds
 
