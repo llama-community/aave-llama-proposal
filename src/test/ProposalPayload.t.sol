@@ -21,8 +21,6 @@ contract ProposalPayloadTest is Test {
     address[] private aaveWhales;
 
     address private proposalPayloadAddress;
-    address private tokenDistributorAddress;
-    address private ecosystemReserveAddress;
 
     address[] private targets;
     uint256[] private values;
@@ -76,19 +74,13 @@ contract ProposalPayloadTest is Test {
     /*******************************************************************************/
 
     function _createProposal() public {
-        // Uncomment to deploy new implementation contracts for testing
-        // tokenDistributorAddress = deployCode("TokenDistributor.sol:TokenDistributor");
-        // ecosystemReserveAddress = deployCode("AaveEcosystemReserve.sol:AaveEcosystemReserve");
-
         ProposalPayload proposalPayload = new ProposalPayload();
         proposalPayloadAddress = address(proposalPayload);
-
-        bytes memory emptyBytes;
 
         targets.push(proposalPayloadAddress);
         values.push(0);
         signatures.push("execute()");
-        calldatas.push(emptyBytes);
+        calldatas.push("");
         withDelegatecalls.push(true);
 
         vm.prank(aaveWhales[0]);
