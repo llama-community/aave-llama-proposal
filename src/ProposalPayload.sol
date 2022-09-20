@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import {IAaveEcosystemReserveController} from "./external/aave/IAaveEcosystemReserveController.sol";
-import {IStreamable} from "./external/aave/IStreamable.sol";
 
 /**
  * @title Llama <> AAVE Proposal
@@ -19,8 +18,6 @@ contract ProposalPayload {
     IAaveEcosystemReserveController public constant AAVE_ECOSYSTEM_RESERVE_CONTROLLER =
         IAaveEcosystemReserveController(0x3d569673dAa0575c936c7c67c4E6AedA69CC630C);
 
-    IStreamable public constant ECOSYSTEM_RESERVE_V2_IMPL = IStreamable(0x1aa435ed226014407Fa6b889e9d06c02B1a12AF3);
-
     address public constant AAVE_MAINNET_RESERVE_FACTOR = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
     address public constant AAVE_ECOSYSTEM_RESERVE = 0x25F2226B597E8F9514B3F68F00f494cF4f286491;
     address public constant LLAMA_RECIPIENT = 0xb428C6812E53F843185986472bb7c1E25632e0f7;
@@ -31,11 +28,14 @@ contract ProposalPayload {
     // 500,000 aUSDC = $0.5 Million
     uint256 public constant AUSDC_UPFRONT_AMOUNT = 500000e6; // 500,000 aUSDC
 
-    // TODO: Figure out why we need the additional amount for streaming
-    // ~700,000 aUSDC (A bit more for the streaming requirements) = $0.7 million
-    uint256 public constant AUSDC_STREAM_AMOUNT = 700000e6;
-    // ~3,480 AAVE (A bit more for the streaming requirements) = $0.3 Million using 30 day TWAP on day of proposal
-    uint256 public constant AAVE_STREAM_AMOUNT = 3480e18;
+    // ~700,000 aUSDC = $0.7 million
+    // Small additional amount to handle remainder condition during streaming
+    // https://github.com/bgd-labs/aave-ecosystem-reserve-v2/blob/release/final-proposal/src/AaveEcosystemReserveV2.sol#L229-L233
+    uint256 public constant AUSDC_STREAM_AMOUNT = 700026624000;
+    // ~3,480 AAVE = $0.3 Million using 30 day TWAP on day of proposal
+    // Small additional amount to handle remainder condition during streaming
+    // https://github.com/bgd-labs/aave-ecosystem-reserve-v2/blob/release/final-proposal/src/AaveEcosystemReserveV2.sol#L229-L233
+    uint256 public constant AAVE_STREAM_AMOUNT = 3480000000000008832000;
     // 12 months of 30 days
     uint256 public constant STREAMS_DURATION = 360 days; // 12 months of 30 days
 
