@@ -34,7 +34,7 @@ contract ProposalPayload {
     // TODO: Figure out why we need the additional amount for streaming
     // ~700,000 aUSDC (A bit more for the streaming requirements) = $0.7 million
     uint256 public constant AUSDC_STREAM_AMOUNT = 700000e6;
-    // ~3'480 AAVE (A bit more for the streaming requirements) = $0.3 Million using 30 day TWAP on day of proposal
+    // ~3,480 AAVE (A bit more for the streaming requirements) = $0.3 Million using 30 day TWAP on day of proposal
     uint256 public constant AAVE_STREAM_AMOUNT = 3480e18;
     // 12 months of 30 days
     uint256 public constant STREAMS_DURATION = 360 days; // 12 months of 30 days
@@ -45,6 +45,7 @@ contract ProposalPayload {
 
     /// @notice The AAVE governance executor calls this function to implement the proposal.
     function execute() external {
+        // Upfront Payment
         // Transfer of the upfront payment: $0.5 million in aUSDC
         AAVE_ECOSYSTEM_RESERVE_CONTROLLER.transfer(
             AAVE_MAINNET_RESERVE_FACTOR,
@@ -53,7 +54,24 @@ contract ProposalPayload {
             AUSDC_UPFRONT_AMOUNT
         );
 
-        // TODO: Implement streaming of aUSDC and AAVE over 12 months
-        // TODO: Figure out if and how to implement the stream cancel ability after 6 months here
+        // Creation of the streams
+        // Stream of $0.7 million in aUSDC over 12 months
+        AAVE_ECOSYSTEM_RESERVE_CONTROLLER.createStream(
+            AAVE_MAINNET_RESERVE_FACTOR,
+            LLAMA_RECIPIENT,
+            AUSDC_STREAM_AMOUNT,
+            AUSDC_TOKEN,
+            block.timestamp,
+            block.timestamp + STREAMS_DURATION
+        );
+        // Stream of $0.3 million in AAVE over 12 months (using 30 day TWAP on day of proposal)
+        AAVE_ECOSYSTEM_RESERVE_CONTROLLER.createStream(
+            AAVE_ECOSYSTEM_RESERVE,
+            LLAMA_RECIPIENT,
+            AAVE_STREAM_AMOUNT,
+            AAVE_TOKEN,
+            block.timestamp,
+            block.timestamp + STREAMS_DURATION
+        );
     }
 }
