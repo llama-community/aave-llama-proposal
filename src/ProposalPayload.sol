@@ -23,7 +23,7 @@ contract ProposalPayload {
 
     address public constant AAVE_MAINNET_RESERVE_FACTOR = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
     address public constant AAVE_ECOSYSTEM_RESERVE = 0x25F2226B597E8F9514B3F68F00f494cF4f286491;
-    address public constant LLAMA_TREASURY = 0xA519a7cE7B24333055781133B13532AEabfAC81b;
+    address public constant LLAMA_RECIPIENT = 0xb428C6812E53F843185986472bb7c1E25632e0f7;
 
     address public constant AUSDC_TOKEN = 0xBcca60bB61934080951369a648Fb03DF4F96263C;
     address public constant AAVE_TOKEN = 0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9;
@@ -49,7 +49,7 @@ contract ProposalPayload {
         AAVE_ECOSYSTEM_RESERVE_CONTROLLER.transfer(
             AAVE_MAINNET_RESERVE_FACTOR,
             AUSDC_TOKEN,
-            LLAMA_TREASURY,
+            LLAMA_RECIPIENT,
             AUSDC_UPFRONT_AMOUNT
         );
 
