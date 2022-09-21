@@ -125,6 +125,38 @@ contract ProposalPayloadTest is Test {
         assertEq(tokenAddressAave, address(AAVE));
         assertEq(stopTimeAave - startTimeAave, STREAMS_DURATION);
         assertEq(remainingBalanceAave, AAVE_STREAM_AMOUNT);
+
+        // Checking if Llama can withdraw from streams
+        vm.startPrank(LLAMA_RECIPIENT);
+        vm.warp(startTimeAusdc);
+        // Checking Llama withdrawal every 30 days over 12 month period
+        for (uint256 i = 0; i < 12; i++) {
+            vm.warp(block.timestamp + 30 days);
+
+            uint256 currentAaveLlamaBalance = AAVE.balanceOf(LLAMA_RECIPIENT);
+            // uint256 currentAusdcLlamaBalance = AUSDC.balanceOf(LLAMA_RECIPIENT);
+            uint256 currentAusdcLlamaStreamBalance = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.balanceOf(
+                nextMainnetReserveFactorStreamID,
+                LLAMA_RECIPIENT
+            );
+            uint256 currentAaveLlamaStreamBalance = STREAMABLE_AAVE_ECOSYSTEM_RESERVE.balanceOf(
+                nextEcosystemReserveStreamID,
+                LLAMA_RECIPIENT
+            );
+
+            STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.withdrawFromStream(
+                nextMainnetReserveFactorStreamID,
+                currentAusdcLlamaStreamBalance
+            );
+
+            STREAMABLE_AAVE_ECOSYSTEM_RESERVE.withdrawFromStream(
+                nextEcosystemReserveStreamID,
+                currentAaveLlamaStreamBalance
+            );
+
+            assertEq(AAVE.balanceOf(LLAMA_RECIPIENT), currentAaveLlamaBalance + currentAaveLlamaStreamBalance);
+            // assertEq(AUSDC.balanceOf(LLAMA_RECIPIENT), currentAusdcLlamaBalance + currentAaveLlamaStreamBalance);
+        }
     }
 
     function _executeProposal() public {
