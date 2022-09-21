@@ -133,8 +133,8 @@ contract ProposalPayloadTest is Test {
         for (uint256 i = 0; i < 12; i++) {
             vm.warp(block.timestamp + 30 days);
 
+            uint256 currentAusdcLlamaBalance = AUSDC.balanceOf(LLAMA_RECIPIENT);
             uint256 currentAaveLlamaBalance = AAVE.balanceOf(LLAMA_RECIPIENT);
-            // uint256 currentAusdcLlamaBalance = AUSDC.balanceOf(LLAMA_RECIPIENT);
             uint256 currentAusdcLlamaStreamBalance = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.balanceOf(
                 nextMainnetReserveFactorStreamID,
                 LLAMA_RECIPIENT
@@ -154,9 +154,15 @@ contract ProposalPayloadTest is Test {
                 currentAaveLlamaStreamBalance
             );
 
+            // Compensating for +1/-1 precision issues when rounding, mainly on aTokens
+            assertApproxEqAbs(
+                AUSDC.balanceOf(LLAMA_RECIPIENT),
+                currentAusdcLlamaBalance + currentAusdcLlamaStreamBalance,
+                1
+            );
             assertEq(AAVE.balanceOf(LLAMA_RECIPIENT), currentAaveLlamaBalance + currentAaveLlamaStreamBalance);
-            // assertEq(AUSDC.balanceOf(LLAMA_RECIPIENT), currentAusdcLlamaBalance + currentAaveLlamaStreamBalance);
         }
+        vm.stopPrank();
     }
 
     function _executeProposal() public {
