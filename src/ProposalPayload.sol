@@ -29,16 +29,17 @@ contract ProposalPayload {
     address public constant AAVE_TOKEN = 0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9;
 
     // 500,000 aUSDC = $0.5 Million
-    uint256 public constant AUSDC_UPFRONT_AMOUNT = 500000e6; // 500,000 aUSDC
+    uint256 public constant AUSDC_UPFRONT_AMOUNT = 500_000e6; // 500,000 aUSDC
 
     // ~700,000 aUSDC = $0.7 million
     // Small additional amount to handle remainder condition during streaming
     // https://github.com/bgd-labs/aave-ecosystem-reserve-v2/blob/release/final-proposal/src/AaveEcosystemReserveV2.sol#L229-L233
-    uint256 public constant AUSDC_STREAM_AMOUNT = 700026624000;
+    uint256 public constant AUSDC_STREAM_AMOUNT = 700_000e6 + 26624000;
     // ~3,480 AAVE = $0.3 Million using 30 day TWAP on day of proposal
     // Small additional amount to handle remainder condition during streaming
     // https://github.com/bgd-labs/aave-ecosystem-reserve-v2/blob/release/final-proposal/src/AaveEcosystemReserveV2.sol#L229-L233
-    uint256 public constant AAVE_STREAM_AMOUNT = 3480000000000008832000;
+    // TODO: Update AAVE Stream amount according to 30 day TWAP on day of proposal
+    uint256 public constant AAVE_STREAM_AMOUNT = 3480e18 + 8832000;
     // 12 months of 30 days
     uint256 public constant STREAMS_DURATION = 360 days; // 12 months of 30 days
 
