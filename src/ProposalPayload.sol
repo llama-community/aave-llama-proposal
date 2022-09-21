@@ -18,8 +18,11 @@ contract ProposalPayload {
     IAaveEcosystemReserveController public constant AAVE_ECOSYSTEM_RESERVE_CONTROLLER =
         IAaveEcosystemReserveController(0x3d569673dAa0575c936c7c67c4E6AedA69CC630C);
 
+    // Reserve that holds the aTokens and other assets
     address public constant AAVE_MAINNET_RESERVE_FACTOR = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
+    // Reserve that holds AAVE tokens
     address public constant AAVE_ECOSYSTEM_RESERVE = 0x25F2226B597E8F9514B3F68F00f494cF4f286491;
+    // Llama Recipient address
     address public constant LLAMA_RECIPIENT = 0xb428C6812E53F843185986472bb7c1E25632e0f7;
 
     address public constant AUSDC_TOKEN = 0xBcca60bB61934080951369a648Fb03DF4F96263C;

@@ -68,12 +68,20 @@ contract ProposalPayloadTest is Test {
 
         _executeProposal();
 
-        // Checking upfront aUSDC payment
+        uint256 postProposalMainnetReserveFactorAusdcBalance = AUSDC.balanceOf(AAVE_MAINNET_RESERVE_FACTOR);
+        uint256 postProposalLlamaAusdcBalance = AUSDC.balanceOf(LLAMA_RECIPIENT);
+
+        // Checking upfront aUSDC payment $0.5 million
         assertEq(
             initialMainnetReserveFactorAusdcBalance - AUSDC_UPFRONT_AMOUNT,
-            AUSDC.balanceOf(AAVE_MAINNET_RESERVE_FACTOR)
+            postProposalMainnetReserveFactorAusdcBalance
         );
-        assertEq(initialLlamaAusdcBalance + AUSDC_UPFRONT_AMOUNT, AUSDC.balanceOf(LLAMA_RECIPIENT));
+        assertEq(initialLlamaAusdcBalance + AUSDC_UPFRONT_AMOUNT, postProposalLlamaAusdcBalance);
+
+        IStreamable aaveMainnetReserveFactor = IStreamable(AAVE_MAINNET_RESERVE_FACTOR);
+        uint256 expectedMainnetReserveFactorStreamID = 100003;
+        IStreamable aaveEcosystemReserve = IStreamable(AAVE_ECOSYSTEM_RESERVE);
+        uint256 expectedEcosystemReserveStreamID = 100001;
     }
 
     function _executeProposal() public {

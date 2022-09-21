@@ -36,6 +36,12 @@ interface IStreamable {
 
     function balanceOf(uint256 streamId, address who) external view returns (uint256 balance);
 
+    function deltaOf(uint256 streamId) external view returns (uint256 delta);
+
+    function getFundsAdmin() external view returns (address);
+
+    function getNextStreamId() external view returns (uint256);
+
     function getStream(uint256 streamId)
         external
         view
