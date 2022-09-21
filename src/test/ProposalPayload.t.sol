@@ -26,7 +26,7 @@ contract ProposalPayloadTest is Test {
     uint256 public constant AUSDC_UPFRONT_AMOUNT = 500000e6;
     uint256 public constant AUSDC_STREAM_AMOUNT = 700026624000;
     uint256 public constant AAVE_STREAM_AMOUNT = 3480000000000008832000;
-    int256 public constant STREAMS_DURATION = 360 days;
+    uint256 public constant STREAMS_DURATION = 360 days;
 
     address[] private aaveWhales;
 
@@ -87,8 +87,44 @@ contract ProposalPayloadTest is Test {
         );
         assertApproxEqAbs(initialLlamaAusdcBalance + AUSDC_UPFRONT_AMOUNT, postProposalLlamaAusdcBalance, 1);
 
-        // console.log(STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.getStream(nextMainnetReserveFactorStreamID));
-        // console.log(STREAMABLE_AAVE_ECOSYSTEM_RESERVE.getStream(nextEcosystemReserveStreamID));
+        // Checking if the streams have been created properly
+        // aUSDC stream
+        (
+            address senderAusdc,
+            address recipientAusdc,
+            uint256 depositAusdc,
+            address tokenAddressAusdc,
+            uint256 startTimeAusdc,
+            uint256 stopTimeAusdc,
+            uint256 remainingBalanceAusdc,
+            uint256 ratePerSecondAusdc
+        ) = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.getStream(nextMainnetReserveFactorStreamID);
+
+        assertEq(senderAusdc, AAVE_MAINNET_RESERVE_FACTOR);
+        assertEq(recipientAusdc, LLAMA_RECIPIENT);
+        assertEq(depositAusdc, AUSDC_STREAM_AMOUNT);
+        assertEq(tokenAddressAusdc, address(AUSDC));
+        assertEq(stopTimeAusdc - startTimeAusdc, STREAMS_DURATION);
+        assertEq(remainingBalanceAusdc, AUSDC_STREAM_AMOUNT);
+
+        // AAVE stream
+        (
+            address senderAave,
+            address recipientAave,
+            uint256 depositAave,
+            address tokenAddressAave,
+            uint256 startTimeAave,
+            uint256 stopTimeAave,
+            uint256 remainingBalanceAave,
+            uint256 ratePerSecondAave
+        ) = STREAMABLE_AAVE_ECOSYSTEM_RESERVE.getStream(nextEcosystemReserveStreamID);
+
+        assertEq(senderAave, AAVE_ECOSYSTEM_RESERVE);
+        assertEq(recipientAave, LLAMA_RECIPIENT);
+        assertEq(depositAave, AAVE_STREAM_AMOUNT);
+        assertEq(tokenAddressAave, address(AAVE));
+        assertEq(stopTimeAave - startTimeAave, STREAMS_DURATION);
+        assertEq(remainingBalanceAave, AAVE_STREAM_AMOUNT);
     }
 
     function _executeProposal() public {
