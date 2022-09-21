@@ -128,7 +128,6 @@ contract ProposalPayloadTest is Test {
 
         // Checking if Llama can withdraw from streams
         vm.startPrank(LLAMA_RECIPIENT);
-        vm.warp(startTimeAusdc);
         // Checking Llama withdrawal every 30 days over 12 month period
         for (uint256 i = 0; i < 12; i++) {
             vm.warp(block.timestamp + 30 days);
@@ -160,7 +159,13 @@ contract ProposalPayloadTest is Test {
                 currentAusdcLlamaBalance + currentAusdcLlamaStreamBalance,
                 1
             );
+            assertApproxEqAbs(
+                AUSDC.balanceOf(LLAMA_RECIPIENT),
+                currentAusdcLlamaBalance + (ratePerSecondAusdc * 30 days),
+                1
+            );
             assertEq(AAVE.balanceOf(LLAMA_RECIPIENT), currentAaveLlamaBalance + currentAaveLlamaStreamBalance);
+            assertEq(AAVE.balanceOf(LLAMA_RECIPIENT), currentAaveLlamaBalance + (ratePerSecondAave * 30 days));
         }
         vm.stopPrank();
     }
