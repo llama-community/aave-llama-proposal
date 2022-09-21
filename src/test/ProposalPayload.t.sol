@@ -20,6 +20,9 @@ contract ProposalPayloadTest is Test {
     address public constant AAVE_ECOSYSTEM_RESERVE = 0x25F2226B597E8F9514B3F68F00f494cF4f286491;
     address public constant LLAMA_RECIPIENT = 0xb428C6812E53F843185986472bb7c1E25632e0f7;
 
+    IStreamable public constant STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR = IStreamable(AAVE_MAINNET_RESERVE_FACTOR);
+    IStreamable public constant STREAMABLE_AAVE_ECOSYSTEM_RESERVE = IStreamable(AAVE_ECOSYSTEM_RESERVE);
+
     uint256 public constant AUSDC_UPFRONT_AMOUNT = 500000e6;
     uint256 public constant AUSDC_STREAM_AMOUNT = 700026624000;
     uint256 public constant AAVE_STREAM_AMOUNT = 3480000000000008832000;
@@ -66,22 +69,26 @@ contract ProposalPayloadTest is Test {
         uint256 initialMainnetReserveFactorAusdcBalance = AUSDC.balanceOf(AAVE_MAINNET_RESERVE_FACTOR);
         uint256 initialLlamaAusdcBalance = AUSDC.balanceOf(LLAMA_RECIPIENT);
 
+        // Capturing next Stream IDs before proposal is executed
+        uint256 nextMainnetReserveFactorStreamID = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.getNextStreamId();
+        uint256 nextEcosystemReserveStreamID = STREAMABLE_AAVE_ECOSYSTEM_RESERVE.getNextStreamId();
+
         _executeProposal();
 
         uint256 postProposalMainnetReserveFactorAusdcBalance = AUSDC.balanceOf(AAVE_MAINNET_RESERVE_FACTOR);
         uint256 postProposalLlamaAusdcBalance = AUSDC.balanceOf(LLAMA_RECIPIENT);
 
         // Checking upfront aUSDC payment $0.5 million
-        assertEq(
+        // Compensating for +1/-1 precision issues when rounding, mainly on aTokens
+        assertApproxEqAbs(
             initialMainnetReserveFactorAusdcBalance - AUSDC_UPFRONT_AMOUNT,
-            postProposalMainnetReserveFactorAusdcBalance
+            postProposalMainnetReserveFactorAusdcBalance,
+            1
         );
-        assertEq(initialLlamaAusdcBalance + AUSDC_UPFRONT_AMOUNT, postProposalLlamaAusdcBalance);
+        assertApproxEqAbs(initialLlamaAusdcBalance + AUSDC_UPFRONT_AMOUNT, postProposalLlamaAusdcBalance, 1);
 
-        IStreamable aaveMainnetReserveFactor = IStreamable(AAVE_MAINNET_RESERVE_FACTOR);
-        uint256 expectedMainnetReserveFactorStreamID = 100003;
-        IStreamable aaveEcosystemReserve = IStreamable(AAVE_ECOSYSTEM_RESERVE);
-        uint256 expectedEcosystemReserveStreamID = 100001;
+        // console.log(STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.getStream(nextMainnetReserveFactorStreamID));
+        // console.log(STREAMABLE_AAVE_ECOSYSTEM_RESERVE.getStream(nextEcosystemReserveStreamID));
     }
 
     function _executeProposal() public {
