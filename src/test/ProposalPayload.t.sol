@@ -8,9 +8,21 @@ import "@forge-std/Test.sol";
 import {IAaveGovernanceV2} from "../external/aave/IAaveGovernanceV2.sol";
 import {ProposalPayload} from "../ProposalPayload.sol";
 import {DeployMainnetProposal} from "../../script/DeployMainnetProposal.s.sol";
+import {IERC20} from "@openzeppelin/token/ERC20/IERC20.sol";
 
 contract ProposalPayloadTest is Test {
     IAaveGovernanceV2 private aaveGovernanceV2 = IAaveGovernanceV2(0xEC568fffba86c094cf06b22134B23074DFE2252c);
+    IERC20 public constant AUSDC = IERC20(0xBcca60bB61934080951369a648Fb03DF4F96263C);
+    IERC20 public constant AAVE = IERC20(0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9);
+
+    address public constant AAVE_MAINNET_RESERVE_FACTOR = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
+    address public constant AAVE_ECOSYSTEM_RESERVE = 0x25F2226B597E8F9514B3F68F00f494cF4f286491;
+    address public constant LLAMA_RECIPIENT = 0xb428C6812E53F843185986472bb7c1E25632e0f7;
+
+    uint256 public constant AUSDC_UPFRONT_AMOUNT = 500000e6;
+    uint256 public constant AUSDC_STREAM_AMOUNT = 700026624000;
+    uint256 public constant AAVE_STREAM_AMOUNT = 3480000000000008832000;
+    int256 public constant STREAMS_DURATION = 360 days;
 
     address[] private aaveWhales;
 
@@ -50,9 +62,16 @@ contract ProposalPayloadTest is Test {
     }
 
     function testExecute() public {
-        // Pre-execution assertations
+        uint256 initialMainnetReserveFactorAusdcBalance = AUSDC.balanceOf(AAVE_MAINNET_RESERVE_FACTOR);
+        uint256 initialLlamaAusdcBalance = AUSDC.balanceOf(LLAMA_RECIPIENT);
+
         _executeProposal();
-        // Post-execution assertations
+
+        assertEq(
+            initialMainnetReserveFactorAusdcBalance - AUSDC_UPFRONT_AMOUNT,
+            AUSDC.balanceOf(AAVE_MAINNET_RESERVE_FACTOR)
+        );
+        assertEq(initialLlamaAusdcBalance + AUSDC_UPFRONT_AMOUNT, AUSDC.balanceOf(LLAMA_RECIPIENT));
     }
 
     function _executeProposal() public {
