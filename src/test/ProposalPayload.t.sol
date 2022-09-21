@@ -6,6 +6,7 @@ import "@forge-std/Test.sol";
 
 // contract dependencies
 import {IAaveGovernanceV2} from "../external/aave/IAaveGovernanceV2.sol";
+import {IStreamable} from "../external/aave/IStreamable.sol";
 import {ProposalPayload} from "../ProposalPayload.sol";
 import {DeployMainnetProposal} from "../../script/DeployMainnetProposal.s.sol";
 import {IERC20} from "@openzeppelin/token/ERC20/IERC20.sol";
@@ -67,6 +68,7 @@ contract ProposalPayloadTest is Test {
 
         _executeProposal();
 
+        // Checking upfront aUSDC payment
         assertEq(
             initialMainnetReserveFactorAusdcBalance - AUSDC_UPFRONT_AMOUNT,
             AUSDC.balanceOf(AAVE_MAINNET_RESERVE_FACTOR)
