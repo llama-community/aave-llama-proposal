@@ -28,8 +28,11 @@ contract ProposalPayload {
     address public constant AUSDC_TOKEN = 0xBcca60bB61934080951369a648Fb03DF4F96263C;
     address public constant AAVE_TOKEN = 0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9;
 
-    // 500,000 aUSDC = $0.5 Million
-    uint256 public constant AUSDC_UPFRONT_AMOUNT = 500_000e6; // 500,000 aUSDC
+    // 350,000 aUSDC = $0.35 Million
+    uint256 public constant AUSDC_UPFRONT_AMOUNT = 350_000e6;
+    // 1,740 AAVE = $0.15 Million using 30 day TWAP on day of proposal
+    // TODO: Update AAVE upfront amount according to 30 day TWAP on day of proposal
+    uint256 public constant AAVE_UPFRONT_AMOUNT = 1740e18;
 
     // ~700,000 aUSDC = $0.7 million
     // Small additional amount to handle remainder condition during streaming
@@ -41,7 +44,7 @@ contract ProposalPayload {
     // TODO: Update AAVE Stream amount according to 30 day TWAP on day of proposal
     uint256 public constant AAVE_STREAM_AMOUNT = 3480e18 + 8832000;
     // 12 months of 30 days
-    uint256 public constant STREAMS_DURATION = 360 days; // 12 months of 30 days
+    uint256 public constant STREAMS_DURATION = 360 days;
 
     /*****************
      *   FUNCTIONS   *
@@ -50,12 +53,19 @@ contract ProposalPayload {
     /// @notice The AAVE governance executor calls this function to implement the proposal.
     function execute() external {
         // Upfront Payment
-        // Transfer of the upfront payment: $0.5 million in aUSDC
+        // Transfer of the upfront aUSDC payment: $0.35 million in aUSDC
         AAVE_ECOSYSTEM_RESERVE_CONTROLLER.transfer(
             AAVE_MAINNET_RESERVE_FACTOR,
             AUSDC_TOKEN,
             LLAMA_RECIPIENT,
             AUSDC_UPFRONT_AMOUNT
+        );
+        // Transfer of the upfront AAVE payment: $0.15 million in AAVE (using 30 day TWAP on day of proposal)
+        AAVE_ECOSYSTEM_RESERVE_CONTROLLER.transfer(
+            AAVE_ECOSYSTEM_RESERVE,
+            AAVE_TOKEN,
+            LLAMA_RECIPIENT,
+            AAVE_UPFRONT_AMOUNT
         );
 
         // Creation of the streams

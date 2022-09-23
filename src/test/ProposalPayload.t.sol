@@ -23,7 +23,8 @@ contract ProposalPayloadTest is Test {
     IStreamable public constant STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR = IStreamable(AAVE_MAINNET_RESERVE_FACTOR);
     IStreamable public constant STREAMABLE_AAVE_ECOSYSTEM_RESERVE = IStreamable(AAVE_ECOSYSTEM_RESERVE);
 
-    uint256 public constant AUSDC_UPFRONT_AMOUNT = 500000e6;
+    uint256 public constant AUSDC_UPFRONT_AMOUNT = 350000e6;
+    uint256 public constant AAVE_UPFRONT_AMOUNT = 1740e18;
     uint256 public constant AUSDC_STREAM_AMOUNT = 700026624000;
     uint256 public constant AAVE_STREAM_AMOUNT = 3480000000000008832000;
     uint256 public constant STREAMS_DURATION = 360 days;
@@ -68,6 +69,8 @@ contract ProposalPayloadTest is Test {
     function testExecute() public {
         uint256 initialMainnetReserveFactorAusdcBalance = AUSDC.balanceOf(AAVE_MAINNET_RESERVE_FACTOR);
         uint256 initialLlamaAusdcBalance = AUSDC.balanceOf(LLAMA_RECIPIENT);
+        uint256 initialEcosystemReserveAaveBalance = AAVE.balanceOf(AAVE_ECOSYSTEM_RESERVE);
+        uint256 initialLlamaAaveBalance = AAVE.balanceOf(LLAMA_RECIPIENT);
 
         // Capturing next Stream IDs before proposal is executed
         uint256 nextMainnetReserveFactorStreamID = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.getNextStreamId();
@@ -75,17 +78,17 @@ contract ProposalPayloadTest is Test {
 
         _executeProposal();
 
-        uint256 postProposalMainnetReserveFactorAusdcBalance = AUSDC.balanceOf(AAVE_MAINNET_RESERVE_FACTOR);
-        uint256 postProposalLlamaAusdcBalance = AUSDC.balanceOf(LLAMA_RECIPIENT);
-
-        // Checking upfront aUSDC payment $0.5 million
+        // Checking upfront aUSDC payment of $0.35 million
         // Compensating for +1/-1 precision issues when rounding, mainly on aTokens
         assertApproxEqAbs(
             initialMainnetReserveFactorAusdcBalance - AUSDC_UPFRONT_AMOUNT,
-            postProposalMainnetReserveFactorAusdcBalance,
+            AUSDC.balanceOf(AAVE_MAINNET_RESERVE_FACTOR),
             1
         );
-        assertApproxEqAbs(initialLlamaAusdcBalance + AUSDC_UPFRONT_AMOUNT, postProposalLlamaAusdcBalance, 1);
+        assertApproxEqAbs(initialLlamaAusdcBalance + AUSDC_UPFRONT_AMOUNT, AUSDC.balanceOf(LLAMA_RECIPIENT), 1);
+        // Checking upfront AAVE payment of $0.15 million
+        assertEq(initialEcosystemReserveAaveBalance - AAVE_UPFRONT_AMOUNT, AAVE.balanceOf(AAVE_ECOSYSTEM_RESERVE));
+        assertEq(initialLlamaAaveBalance + AAVE_UPFRONT_AMOUNT, AAVE.balanceOf(LLAMA_RECIPIENT));
 
         // Checking if the streams have been created properly
         // aUSDC stream
@@ -154,6 +157,7 @@ contract ProposalPayloadTest is Test {
             );
 
             // Compensating for +1/-1 precision issues when rounding, mainly on aTokens
+            // Checking aUSDC stream amount
             assertApproxEqAbs(
                 AUSDC.balanceOf(LLAMA_RECIPIENT),
                 currentAusdcLlamaBalance + currentAusdcLlamaStreamBalance,
@@ -164,6 +168,7 @@ contract ProposalPayloadTest is Test {
                 currentAusdcLlamaBalance + (ratePerSecondAusdc * 30 days),
                 1
             );
+            // Checking AAVE stream amount
             assertEq(AAVE.balanceOf(LLAMA_RECIPIENT), currentAaveLlamaBalance + currentAaveLlamaStreamBalance);
             assertEq(AAVE.balanceOf(LLAMA_RECIPIENT), currentAaveLlamaBalance + (ratePerSecondAave * 30 days));
         }
