@@ -8,7 +8,7 @@ import {IAaveEcosystemReserveController} from "./external/aave/IAaveEcosystemRes
  * @author Llama
  * @notice Payload to execute the Llama <> AAVE Proposal
  * Governance Forum Post: https://governance.aave.com/t/updated-proposal-llama-aave/9924
- * Snapshot:
+ * Snapshot: https://snapshot.org/#/aave.eth/proposal/0x9f65a598bee69a1dd84127d712ffedbc0795f0647e89056a297cae998dd18bf1
  */
 contract ProposalPayload {
     /********************************
