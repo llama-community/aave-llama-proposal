@@ -6,11 +6,28 @@ import "@forge-std/Test.sol";
 
 // contract dependencies
 import {IAaveGovernanceV2} from "../external/aave/IAaveGovernanceV2.sol";
+import {IStreamable} from "../external/aave/IStreamable.sol";
 import {ProposalPayload} from "../ProposalPayload.sol";
 import {DeployMainnetProposal} from "../../script/DeployMainnetProposal.s.sol";
+import {IERC20} from "@openzeppelin/token/ERC20/IERC20.sol";
 
 contract ProposalPayloadTest is Test {
     IAaveGovernanceV2 private aaveGovernanceV2 = IAaveGovernanceV2(0xEC568fffba86c094cf06b22134B23074DFE2252c);
+    IERC20 public constant AUSDC = IERC20(0xBcca60bB61934080951369a648Fb03DF4F96263C);
+    IERC20 public constant AAVE = IERC20(0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9);
+
+    address public constant AAVE_MAINNET_RESERVE_FACTOR = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
+    address public constant AAVE_ECOSYSTEM_RESERVE = 0x25F2226B597E8F9514B3F68F00f494cF4f286491;
+    address public constant LLAMA_RECIPIENT = 0xb428C6812E53F843185986472bb7c1E25632e0f7;
+
+    IStreamable public constant STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR = IStreamable(AAVE_MAINNET_RESERVE_FACTOR);
+    IStreamable public constant STREAMABLE_AAVE_ECOSYSTEM_RESERVE = IStreamable(AAVE_ECOSYSTEM_RESERVE);
+
+    uint256 public constant AUSDC_UPFRONT_AMOUNT = 350000e6;
+    uint256 public constant AAVE_UPFRONT_AMOUNT = 1740e18;
+    uint256 public constant AUSDC_STREAM_AMOUNT = 700026624000;
+    uint256 public constant AAVE_STREAM_AMOUNT = 3480000000000008832000;
+    uint256 public constant STREAMS_DURATION = 360 days;
 
     address[] private aaveWhales;
 
@@ -50,9 +67,112 @@ contract ProposalPayloadTest is Test {
     }
 
     function testExecute() public {
-        // Pre-execution assertations
+        uint256 initialMainnetReserveFactorAusdcBalance = AUSDC.balanceOf(AAVE_MAINNET_RESERVE_FACTOR);
+        uint256 initialLlamaAusdcBalance = AUSDC.balanceOf(LLAMA_RECIPIENT);
+        uint256 initialEcosystemReserveAaveBalance = AAVE.balanceOf(AAVE_ECOSYSTEM_RESERVE);
+        uint256 initialLlamaAaveBalance = AAVE.balanceOf(LLAMA_RECIPIENT);
+
+        // Capturing next Stream IDs before proposal is executed
+        uint256 nextMainnetReserveFactorStreamID = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.getNextStreamId();
+        uint256 nextEcosystemReserveStreamID = STREAMABLE_AAVE_ECOSYSTEM_RESERVE.getNextStreamId();
+
         _executeProposal();
-        // Post-execution assertations
+
+        // Checking upfront aUSDC payment of $0.35 million
+        // Compensating for +1/-1 precision issues when rounding, mainly on aTokens
+        assertApproxEqAbs(
+            initialMainnetReserveFactorAusdcBalance - AUSDC_UPFRONT_AMOUNT,
+            AUSDC.balanceOf(AAVE_MAINNET_RESERVE_FACTOR),
+            1
+        );
+        assertApproxEqAbs(initialLlamaAusdcBalance + AUSDC_UPFRONT_AMOUNT, AUSDC.balanceOf(LLAMA_RECIPIENT), 1);
+        // Checking upfront AAVE payment of $0.15 million
+        assertEq(initialEcosystemReserveAaveBalance - AAVE_UPFRONT_AMOUNT, AAVE.balanceOf(AAVE_ECOSYSTEM_RESERVE));
+        assertEq(initialLlamaAaveBalance + AAVE_UPFRONT_AMOUNT, AAVE.balanceOf(LLAMA_RECIPIENT));
+
+        // Checking if the streams have been created properly
+        // aUSDC stream
+        (
+            address senderAusdc,
+            address recipientAusdc,
+            uint256 depositAusdc,
+            address tokenAddressAusdc,
+            uint256 startTimeAusdc,
+            uint256 stopTimeAusdc,
+            uint256 remainingBalanceAusdc,
+            uint256 ratePerSecondAusdc
+        ) = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.getStream(nextMainnetReserveFactorStreamID);
+
+        assertEq(senderAusdc, AAVE_MAINNET_RESERVE_FACTOR);
+        assertEq(recipientAusdc, LLAMA_RECIPIENT);
+        assertEq(depositAusdc, AUSDC_STREAM_AMOUNT);
+        assertEq(tokenAddressAusdc, address(AUSDC));
+        assertEq(stopTimeAusdc - startTimeAusdc, STREAMS_DURATION);
+        assertEq(remainingBalanceAusdc, AUSDC_STREAM_AMOUNT);
+
+        // AAVE stream
+        (
+            address senderAave,
+            address recipientAave,
+            uint256 depositAave,
+            address tokenAddressAave,
+            uint256 startTimeAave,
+            uint256 stopTimeAave,
+            uint256 remainingBalanceAave,
+            uint256 ratePerSecondAave
+        ) = STREAMABLE_AAVE_ECOSYSTEM_RESERVE.getStream(nextEcosystemReserveStreamID);
+
+        assertEq(senderAave, AAVE_ECOSYSTEM_RESERVE);
+        assertEq(recipientAave, LLAMA_RECIPIENT);
+        assertEq(depositAave, AAVE_STREAM_AMOUNT);
+        assertEq(tokenAddressAave, address(AAVE));
+        assertEq(stopTimeAave - startTimeAave, STREAMS_DURATION);
+        assertEq(remainingBalanceAave, AAVE_STREAM_AMOUNT);
+
+        // Checking if Llama can withdraw from streams
+        vm.startPrank(LLAMA_RECIPIENT);
+        // Checking Llama withdrawal every 30 days over 12 month period
+        for (uint256 i = 0; i < 12; i++) {
+            vm.warp(block.timestamp + 30 days);
+
+            uint256 currentAusdcLlamaBalance = AUSDC.balanceOf(LLAMA_RECIPIENT);
+            uint256 currentAaveLlamaBalance = AAVE.balanceOf(LLAMA_RECIPIENT);
+            uint256 currentAusdcLlamaStreamBalance = STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.balanceOf(
+                nextMainnetReserveFactorStreamID,
+                LLAMA_RECIPIENT
+            );
+            uint256 currentAaveLlamaStreamBalance = STREAMABLE_AAVE_ECOSYSTEM_RESERVE.balanceOf(
+                nextEcosystemReserveStreamID,
+                LLAMA_RECIPIENT
+            );
+
+            STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR.withdrawFromStream(
+                nextMainnetReserveFactorStreamID,
+                currentAusdcLlamaStreamBalance
+            );
+
+            STREAMABLE_AAVE_ECOSYSTEM_RESERVE.withdrawFromStream(
+                nextEcosystemReserveStreamID,
+                currentAaveLlamaStreamBalance
+            );
+
+            // Compensating for +1/-1 precision issues when rounding, mainly on aTokens
+            // Checking aUSDC stream amount
+            assertApproxEqAbs(
+                AUSDC.balanceOf(LLAMA_RECIPIENT),
+                currentAusdcLlamaBalance + currentAusdcLlamaStreamBalance,
+                1
+            );
+            assertApproxEqAbs(
+                AUSDC.balanceOf(LLAMA_RECIPIENT),
+                currentAusdcLlamaBalance + (ratePerSecondAusdc * 30 days),
+                1
+            );
+            // Checking AAVE stream amount
+            assertEq(AAVE.balanceOf(LLAMA_RECIPIENT), currentAaveLlamaBalance + currentAaveLlamaStreamBalance);
+            assertEq(AAVE.balanceOf(LLAMA_RECIPIENT), currentAaveLlamaBalance + (ratePerSecondAave * 30 days));
+        }
+        vm.stopPrank();
     }
 
     function _executeProposal() public {

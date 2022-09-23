@@ -1,31 +1,16 @@
-# AAVE Governance Forge Template
+# Llama <> AAVE Proposal
 
-A template for creating AAVE governance Proposal payload contracts.
+Payload and tests for the Llama <> AAVE Proposal
 
 ## Installation
 
 It requires [Foundry](https://github.com/gakonst/foundry) installed to run. You can find instructions here [Foundry installation](https://github.com/gakonst/foundry#installation).
 
-### GitHub template
-
-It's easiest to start a new project by clicking the ["Use this template"](https://github.com/llama-community/aave-governance-forge-template).
-
-Then clone the templated repository locally and `cd` into it and run the following commands:
+In order to install, run the following commands:
 
 ```sh
-$ npm install
-$ forge install
-$ forge update
-$ git submodule update --init --recursive
-```
-
-### Manual installation
-
-If you want to create your project manually, run the following commands:
-
-```sh
-$ forge init --template https://github.com/llama-community/aave-governance-forge-template <my-repo>
-$ cd <my-repo>
+$ git clone https://github.com/llama-community/aave-llama-proposal.git
+$ cd aave-llama-proposal/
 $ npm install
 $ forge install
 $ forge update
