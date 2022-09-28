@@ -24,9 +24,9 @@ contract ProposalPayloadTest is Test {
     IStreamable public constant STREAMABLE_AAVE_ECOSYSTEM_RESERVE = IStreamable(AAVE_ECOSYSTEM_RESERVE);
 
     uint256 public constant AUSDC_UPFRONT_AMOUNT = 350000e6;
-    uint256 public constant AAVE_UPFRONT_AMOUNT = 1740e18;
+    uint256 public constant AAVE_UPFRONT_AMOUNT = 181368e16;
     uint256 public constant AUSDC_STREAM_AMOUNT = 700026624000;
-    uint256 public constant AAVE_STREAM_AMOUNT = 3480000000000008832000;
+    uint256 public constant AAVE_STREAM_AMOUNT = 3627350000000007552000;
     uint256 public constant STREAMS_DURATION = 360 days;
 
     address[] private aaveWhales;
