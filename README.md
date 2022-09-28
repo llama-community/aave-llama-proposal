@@ -13,8 +13,6 @@ $ git clone https://github.com/llama-community/aave-llama-proposal.git
 $ cd aave-llama-proposal/
 $ npm install
 $ forge install
-$ forge update
-$ git submodule update --init --recursive
 ```
 
 ## Setup
