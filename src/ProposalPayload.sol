@@ -31,7 +31,6 @@ contract ProposalPayload {
     // 350,000 aUSDC = $0.35 Million
     uint256 public constant AUSDC_UPFRONT_AMOUNT = 350000e6;
     // 1,813.68 AAVE = $0.15 Million using 30 day TWAP on day of proposal
-    // 30 Day TWAP Calculation: https://docs.google.com/spreadsheets/d/1EiXdmLXxF-oqxOfS_AN94bpfWtPFnbwigPgiKXgXhW0/edit#gid=0
     uint256 public constant AAVE_UPFRONT_AMOUNT = 181368e16;
 
     // ~700,000 aUSDC = $0.7 million
@@ -39,7 +38,6 @@ contract ProposalPayload {
     // https://github.com/bgd-labs/aave-ecosystem-reserve-v2/blob/release/final-proposal/src/AaveEcosystemReserveV2.sol#L229-L233
     uint256 public constant AUSDC_STREAM_AMOUNT = 700000e6 + 26624000;
     // ~3,627.35 AAVE = $0.3 Million using 30 day TWAP on day of proposal
-    // 30 Day TWAP Calculation: https://docs.google.com/spreadsheets/d/1EiXdmLXxF-oqxOfS_AN94bpfWtPFnbwigPgiKXgXhW0/edit#gid=0
     // Small additional amount to handle remainder condition during streaming
     // https://github.com/bgd-labs/aave-ecosystem-reserve-v2/blob/release/final-proposal/src/AaveEcosystemReserveV2.sol#L229-L233
     uint256 public constant AAVE_STREAM_AMOUNT = 362735e16 + 7552000;

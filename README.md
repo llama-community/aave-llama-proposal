@@ -13,8 +13,6 @@ The Proposal Payload does the following:
 3. Creates a 12-month stream of 700,000 aUSDC ($0.7 Million) to the Llama-controlled address.
 4. Creates a 12-month stream of 3,627.35 AAVE ($0.3 Million using 30 day TWAP on day of proposal) to the Llama-controlled address.
 
-The 30 day TWAP calculation can be found [Here](https://docs.google.com/spreadsheets/d/1EiXdmLXxF-oqxOfS_AN94bpfWtPFnbwigPgiKXgXhW0/edit#gid=0)
-
 ## Installation
 
 It requires [Foundry](https://github.com/gakonst/foundry) installed to run. You can find instructions here [Foundry installation](https://github.com/gakonst/foundry#installation).
