@@ -16,11 +16,6 @@ contract ProposalPayload {
      *   CONSTANTS AND IMMUTABLES   *
      ********************************/
 
-    IAaveEcosystemReserveController public immutable AAVE_ECOSYSTEM_RESERVE_CONTROLLER =
-        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER);
-
-    // Reserve that holds the aTokens and other assets
-    address public immutable AAVE_MAINNET_RESERVE_FACTOR = AaveV2Ethereum.COLLECTOR;
     // Reserve that holds AAVE tokens
     address public constant AAVE_ECOSYSTEM_RESERVE = 0x25F2226B597E8F9514B3F68F00f494cF4f286491;
     // Llama Recipient address
@@ -53,14 +48,14 @@ contract ProposalPayload {
     function execute() external {
         // Upfront Payment
         // Transfer of the upfront aUSDC payment: $0.35 million in aUSDC
-        AAVE_ECOSYSTEM_RESERVE_CONTROLLER.transfer(
-            AAVE_MAINNET_RESERVE_FACTOR,
+        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).transfer(
+            AaveV2Ethereum.COLLECTOR,
             AUSDC_TOKEN,
             LLAMA_RECIPIENT,
             AUSDC_UPFRONT_AMOUNT
         );
         // Transfer of the upfront AAVE payment: $0.15 million in AAVE (using 30 day TWAP on day of proposal)
-        AAVE_ECOSYSTEM_RESERVE_CONTROLLER.transfer(
+        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).transfer(
             AAVE_ECOSYSTEM_RESERVE,
             AAVE_TOKEN,
             LLAMA_RECIPIENT,
@@ -69,8 +64,8 @@ contract ProposalPayload {
 
         // Creation of the streams
         // Stream of $0.7 million in aUSDC over 12 months
-        AAVE_ECOSYSTEM_RESERVE_CONTROLLER.createStream(
-            AAVE_MAINNET_RESERVE_FACTOR,
+        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).createStream(
+            AaveV2Ethereum.COLLECTOR,
             LLAMA_RECIPIENT,
             AUSDC_STREAM_AMOUNT,
             AUSDC_TOKEN,
@@ -78,7 +73,7 @@ contract ProposalPayload {
             block.timestamp + STREAMS_DURATION
         );
         // Stream of $0.3 million in AAVE over 12 months (using 30 day TWAP on day of proposal)
-        AAVE_ECOSYSTEM_RESERVE_CONTROLLER.createStream(
+        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER).createStream(
             AAVE_ECOSYSTEM_RESERVE,
             LLAMA_RECIPIENT,
             AAVE_STREAM_AMOUNT,
