@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {IAaveEcosystemReserveController} from "./external/aave/IAaveEcosystemReserveController.sol";
+import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
 
 /**
  * @title Llama <> AAVE Proposal
@@ -15,11 +16,11 @@ contract ProposalPayload {
      *   CONSTANTS AND IMMUTABLES   *
      ********************************/
 
-    IAaveEcosystemReserveController public constant AAVE_ECOSYSTEM_RESERVE_CONTROLLER =
-        IAaveEcosystemReserveController(0x3d569673dAa0575c936c7c67c4E6AedA69CC630C);
+    IAaveEcosystemReserveController public immutable AAVE_ECOSYSTEM_RESERVE_CONTROLLER =
+        IAaveEcosystemReserveController(AaveV2Ethereum.COLLECTOR_CONTROLLER);
 
     // Reserve that holds the aTokens and other assets
-    address public constant AAVE_MAINNET_RESERVE_FACTOR = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
+    address public immutable AAVE_MAINNET_RESERVE_FACTOR = AaveV2Ethereum.COLLECTOR;
     // Reserve that holds AAVE tokens
     address public constant AAVE_ECOSYSTEM_RESERVE = 0x25F2226B597E8F9514B3F68F00f494cF4f286491;
     // Llama Recipient address

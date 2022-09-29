@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import "@forge-std/Test.sol";
 
 // contract dependencies
+import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
 import {IAaveGovernanceV2} from "../external/aave/IAaveGovernanceV2.sol";
 import {IStreamable} from "../external/aave/IStreamable.sol";
 import {ProposalPayload} from "../ProposalPayload.sol";
@@ -16,11 +17,11 @@ contract ProposalPayloadTest is Test {
     IERC20 public constant AUSDC = IERC20(0xBcca60bB61934080951369a648Fb03DF4F96263C);
     IERC20 public constant AAVE = IERC20(0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9);
 
-    address public constant AAVE_MAINNET_RESERVE_FACTOR = 0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c;
+    address public immutable AAVE_MAINNET_RESERVE_FACTOR = AaveV2Ethereum.COLLECTOR;
     address public constant AAVE_ECOSYSTEM_RESERVE = 0x25F2226B597E8F9514B3F68F00f494cF4f286491;
     address public constant LLAMA_RECIPIENT = 0xb428C6812E53F843185986472bb7c1E25632e0f7;
 
-    IStreamable public constant STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR = IStreamable(AAVE_MAINNET_RESERVE_FACTOR);
+    IStreamable public immutable STREAMABLE_AAVE_MAINNET_RESERVE_FACTOR = IStreamable(AaveV2Ethereum.COLLECTOR);
     IStreamable public constant STREAMABLE_AAVE_ECOSYSTEM_RESERVE = IStreamable(AAVE_ECOSYSTEM_RESERVE);
 
     uint256 public constant AUSDC_UPFRONT_AMOUNT = 350000e6;
