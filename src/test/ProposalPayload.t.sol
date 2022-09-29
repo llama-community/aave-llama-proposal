@@ -5,11 +5,11 @@ pragma solidity ^0.8.0;
 import "@forge-std/Test.sol";
 
 // contract dependencies
-import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
 import {GovHelpers} from "@aave-helpers/GovHelpers.sol";
-import {IStreamable} from "../external/aave/IStreamable.sol";
+import {AaveV2Ethereum} from "@aave-address-book/AaveV2Ethereum.sol";
 import {ProposalPayload} from "../ProposalPayload.sol";
 import {DeployMainnetProposal} from "../../script/DeployMainnetProposal.s.sol";
+import {IStreamable} from "../external/aave/IStreamable.sol";
 import {IERC20} from "@openzeppelin/token/ERC20/IERC20.sol";
 
 contract ProposalPayloadTest is Test {
