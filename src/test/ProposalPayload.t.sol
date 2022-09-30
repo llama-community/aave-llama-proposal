@@ -62,12 +62,11 @@ contract ProposalPayloadTest is Test {
         GovHelpers.passVoteAndExecute(vm, proposalId);
 
         // Checking upfront aUSDC payment of $0.35 million
+        assertLe(
+            initialMainnetReserveFactorAusdcBalance - AUSDC_UPFRONT_AMOUNT,
+            AUSDC.balanceOf(AAVE_MAINNET_RESERVE_FACTOR)
+        );
         // Compensating for +1/-1 precision issues when rounding, mainly on aTokens
-        // assertApproxEqAbs(
-        //     initialMainnetReserveFactorAusdcBalance - AUSDC_UPFRONT_AMOUNT,
-        //     AUSDC.balanceOf(AAVE_MAINNET_RESERVE_FACTOR),
-        //     1
-        // );
         assertApproxEqAbs(initialLlamaAusdcBalance + AUSDC_UPFRONT_AMOUNT, AUSDC.balanceOf(LLAMA_RECIPIENT), 1);
         // Checking upfront AAVE payment of $0.15 million
         assertEq(initialEcosystemReserveAaveBalance - AAVE_UPFRONT_AMOUNT, AAVE.balanceOf(AAVE_ECOSYSTEM_RESERVE));
